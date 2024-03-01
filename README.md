@@ -16,7 +16,7 @@ examples // 使用示例目录，包含示例代码
 README.md
 ```
 ## 下载
-下载对应的[预编译软件包]()
+下载对应的[预编译软件包](https://github.com/RepChain-Group/wasm-sc-runtime/releases)
 
 ## 安装/Installation(非必须)
 若不想在编译代码时添加额外的链接库及头文件目录参数,可以将链接库文件`lib/libwasm-sc-runtime.so`复制到链接器(linker)能找到的默认目录下，如Linux系统下的`/usr/local/lib`或`/usr/lib`等，可将头文件`include/wasm-sc-runtime.h`复制到编译器(compiler)能找到的默认目录下，如Linux系统下的`/usr/local/include`或`usr/include`
