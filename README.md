@@ -11,12 +11,11 @@ include  // 头文件目录
     wasm-sc-runtime.h
 lib      // 链接库目录
     libwasm-sc-runtime.so
+    libwasm-sc-runtime.so.<version>
 examples // 使用示例目录，包含示例代码
     ......
 README.md
 ```
-## 下载
-下载对应的[预编译软件包](https://github.com/RepChain-Group/wasm-sc-runtime/releases)
 
 ## 安装/Installation(非必须)
 若不想在编译代码时添加额外的链接库及头文件目录参数,可以将链接库文件`lib/libwasm-sc-runtime.so`复制到链接器(linker)能找到的默认目录下，如Linux系统下的`/usr/local/lib`或`/usr/lib`等，可将头文件`include/wasm-sc-runtime.h`复制到编译器(compiler)能找到的默认目录下，如Linux系统下的`/usr/local/include`或`usr/include`
@@ -76,6 +75,11 @@ wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
    - unsigned char *args[]: 由若干字节数组表示的合约方法参数, 即每一个合约方法参数用一个字节数组来表示，如args[0]是表示第一个参数的字节数组，args[1]是表示第二个参数的字节数组
    - int args_len[]: 合约方法参数的长度数组，该数组中的每一个元素表示对应index的方法参数的长度值,如args_len[0]表示参数args[0]所占的字节长度
    - int arg_count: 合约方法参数的数量
+
+   返回结构体`struct func_result`包含属性：
+   - func_result_status_enum status: 表示调用合约方法结果状态, 枚举类型，可为0(表示成功), 1(表示失败)
+   - char *err_msg: 以`\0`字符结尾的字符串，表示若结果为失败时附加的错误信息
+   - unsigned long long gas_cost: 调用合约方法结束后所消耗的gas量
 
 - void smart_contract_func_result_delete(func_result *result)
 
