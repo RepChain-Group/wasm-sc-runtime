@@ -20,12 +20,12 @@ README.md
 ## 安装/Installation(非必须)
 若不想在编译代码时添加额外的链接库及头文件目录参数,可以将链接库文件`lib/libwasm-sc-runtime.so`复制到链接器(linker)能找到的默认目录下，如Linux系统下的`/usr/local/lib`或`/usr/lib`等，可将头文件`include/wasm-sc-runtime.h`复制到编译器(compiler)能找到的默认目录下，如Linux系统下的`/usr/local/include`或`usr/include`
 
-也可忽略上述操作，在编译自己的代码时添加相应编译参数，或者基于相应编程语言集成链接库的相关工具和方法直接加载使用链接库和头文件。
+也可忽略上述操作，在编译自己的代码时添加相应编译参数，或者基于相应编程语言集成链接库的相关工具和方法直接在代码中显示加载使用链接库和头文件。
 
 ## 使用/Usage 
 本软件包以链接库形式对外提供合约执行引擎的相应功能，以方便不同编程语言开发环境的集成，这里以开发者基于C语言来集成开发为例进行说明。
 
-若已经执行上述安装操作，可运行编译命令(如使用gcc编译器)： 
+若已经执行上述安装操作，可运行编译命令(以使用gcc编译器为例)： 
 ```bash
 // 编译源码生成可执行程序
 $ gcc -o your_terget_name your_source_code.c -lwasm-sc-runtime
@@ -46,7 +46,7 @@ $ ./your_target_name
 2. 创建智能合约虚拟机vm实例 -> 
 3. 调用智能合约方法。
 
-其中，基于同一个智能合约引擎实例可以创建若干智能合约虚拟机实例。
+其中，基于同一个智能合约执行引擎实例可以创建若干个智能合约虚拟机实例，而基于同一个智能合约虚拟机实例可以进行若干次合约方法调用。
 
 wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
 - wasm_sc_runtime *smart_contract_runtime_new()
@@ -61,6 +61,18 @@ wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
   - int vm_id_len: 虚拟机实例唯一标识字符串长度 
   - const char *wat_file_path: 表示对应的智能合约代码文件路径的字符串指针，目前该文件内容需为文本格式
   - int wat_file_path_len: 表示智能合约代码文件路径的字符串的长度
+
+- wasm_sc_vm *smart_contract_vm_gcl_new(wasm_sc_runtime *runtime, BCEI *bcei, const char *vm_id, int vm_id_len, const char *wat_file_path, int wat_file_path_len);
+
+   根据由GCL合约语言编译得到的专用指令序列合约代码创建智能合约虚拟机实例，其所需参数和方法smart_contract_vm_new一致。
+
+- wasm_sc_vm* smart_contract_vm_new_with_debug(wasm_sc_runtime* runtime, BCEI* bcei, const char* vm_id, int vm_id_len, const char* wat_file_path,int wat_file_path_len, int break_point_line_number);
+
+   创建智能合约虚拟机实例，并支持设置断点获取调试信息。其所需参数与方法smart_contract_vm_new相比多了一个指定断点行号的参数break_point_line_number。
+
+- wasm_sc_vm* smart_contract_vm_gcl_new_with_debug(wasm_sc_runtime* runtime, BCEI* bcei, const char* vm_id, int vm_id_len, const char* wat_file_path,int wat_file_path_len, int break_point_line_number);
+
+   根据由GCL合约语言编译得到的专用指令序列合约代码创建智能合约虚拟机实例，并支持设置断点获取调试信息。其所需参数与方法smart_contract_vm_new_with_debug一致。
 
 - func_result *smart_contract_function_call(wasm_sc_runtime *runtime, wasm_sc_vm *vm, void *ctx, const char *call_id, int call_id_len, const char *func_name, int func_name_len, unsigned char *args[], int args_len[], int arg_count);
 
