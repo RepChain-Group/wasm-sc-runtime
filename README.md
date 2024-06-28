@@ -17,6 +17,9 @@ examples // 使用示例目录，包含示例代码
 README.md
 ```
 
+## 依赖/Dependency
+对于密码学相关专用指令功能的支持依赖`OpenSSL(>= v3.1.1)`，因此需要在操作系统环境中提前安装该依赖。
+
 ## 安装/Installation(非必须)
 若不想在编译代码时添加额外的链接库及头文件目录参数,可以将链接库文件`lib/libwasm-sc-runtime.so`复制到链接器(linker)能找到的默认目录下，如Linux系统下的`/usr/local/lib`或`/usr/lib`等，可将头文件`include/wasm-sc-runtime.h`复制到编译器(compiler)能找到的默认目录下，如Linux系统下的`/usr/local/include`或`usr/include`
 
@@ -32,6 +35,13 @@ $ gcc -o your_terget_name your_source_code.c -lwasm-sc-runtime
 // 运行编译结果
 $ ./your_target_name
 ```
+
+> 若智能合约中有用到密码学相关专用指令功能，编译时需要添加引入OpenSSL共享库的参数`-lssl -lcrypto`，如：
+> ```bash
+> $ gcc -o your_terget_name your_source_code.c -lwasm-sc-runtime -lssl -lcrypto
+> ```
+> 可参考示例文件`examples/crypto/crypto.c`中的相应注释说明部分。
+
 若没有执行上部分的安装操作，可能需要在编译时添加相应参数，如当在本软件包根目录下编译时：
 ```bash
 // 编译源码生成可执行程序
