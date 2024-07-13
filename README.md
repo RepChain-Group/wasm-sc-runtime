@@ -3,15 +3,18 @@ wasm-sc-runtime提供了支持智能合约专用指令集的智能合约执行�
 
 本软件包通过动态链接库/共享链接库的方式提供了C语言形式的API接口，开发者可使用各种流行编程语言（如C/C++, Java, Scala, Go, Python, Rust等）基于相应API接口集成使用智能合约引擎。
 
->Note： *本软件包当前版本只支持Linux AMD64/x86_64平台*
+>Note： *本软件包当前版本只支持Linux AMD64/x86_64, Windows AMD64/x86_64平台*
 
 ## 软件包目录结构
 ```bash
 include  // 头文件目录
     wasm-sc-runtime.h
 lib      // 链接库目录
-    libwasm-sc-runtime.so
-    libwasm-sc-runtime.so.<version>
+    libwasm-sc-runtime.so (for Linux)
+    libwasm-sc-runtime.so.<version> (for Linux)
+
+    wasm-sc-runtime.dll (for Windows)
+    wasmer.dll (for Windows)
 examples // 使用示例目录，包含示例代码
     ......
 README.md
@@ -21,9 +24,12 @@ README.md
 对于密码学相关专用指令功能的支持依赖`OpenSSL(>= v3.1.1)`，因此需要在操作系统环境中提前安装该依赖。
 
 ## 安装/Installation(非必须)
-若不想在编译代码时添加额外的链接库及头文件目录参数,可以将链接库文件`lib/libwasm-sc-runtime.so`复制到链接器(linker)能找到的默认目录下，如Linux系统下的`/usr/local/lib`或`/usr/lib`等，可将头文件`include/wasm-sc-runtime.h`复制到编译器(compiler)能找到的默认目录下，如Linux系统下的`/usr/local/include`或`usr/include`
+若不想在编译代码时添加额外的链接库及头文件目录参数,可以将链接库文件`lib/libwasm-sc-runtime.so`(Windows下为`lib/wasm-sc-runtime.dll`)复制到链接器(linker)能找到的默认目录下，如Linux系统下的`/usr/local/lib`或`/usr/lib`等，可将头文件`include/wasm-sc-runtime.h`复制到编译器(compiler)能找到的默认目录下，如Linux系统下的`/usr/local/include`或`usr/include`
+
+**在Windows平台下建议将本软件包下的链接库目录`lib`添加到系统环境变量`PATH`中以便编译和运行。**
 
 也可忽略上述操作，在编译自己的代码时添加相应编译参数，或者基于相应编程语言集成链接库的相关工具和方法直接在代码中显示加载使用链接库和头文件。
+
 
 ## 使用/Usage 
 本软件包以链接库形式对外提供合约执行引擎的相应功能，以方便不同编程语言开发环境的集成，这里以开发者基于C语言来集成开发为例进行说明。
@@ -34,12 +40,17 @@ README.md
 $ gcc -o your_terget_name your_source_code.c -lwasm-sc-runtime
 // 运行编译结果
 $ ./your_target_name
+// 或Windwos平台下运行
+$ your_target_name.exe
 ```
+> Windows下也可基于MinGW环境使用上述gcc命令编译
+> 注意在Windows平台下建议将本软件包下的链接库目录`lib`添加到系统环境变量`PATH`中以便编译和运行。**
 
 > 若智能合约中有用到密码学相关专用指令功能，编译时需要添加引入OpenSSL共享库的参数`-lssl -lcrypto`，如：
 > ```bash
 > $ gcc -o your_terget_name your_source_code.c -lwasm-sc-runtime -lssl -lcrypto
 > ```
+> Windows下也可基于MinGW环境使用上述gcc命令编译
 > 可参考示例文件`examples/crypto/crypto.c`中的相应注释说明部分。
 
 若没有执行上部分的安装操作，可能需要在编译时添加相应参数，如当在本软件包根目录下编译时：
