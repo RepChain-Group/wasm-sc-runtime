@@ -24,9 +24,9 @@ README.md
 对于密码学相关专用指令功能的支持依赖`OpenSSL(>= v3.1.1)`，因此需要在操作系统环境中提前安装该依赖。
 
 ## 安装/Installation(非必须)
-若不想在编译代码时添加额外的链接库及头文件目录参数,可以将链接库文件`lib/libwasm-sc-runtime.so`(Windows下为`lib/wasm-sc-runtime.dll`)复制到链接器(linker)能找到的默认目录下，如Linux系统下的`/usr/local/lib`或`/usr/lib`等，可将头文件`include/wasm-sc-runtime.h`复制到编译器(compiler)能找到的默认目录下，如Linux系统下的`/usr/local/include`或`usr/include`
+若不想在编译代码时添加额外的链接库及头文件目录参数,可以将链接库文件`lib/libwasm-sc-runtime.so`(Windows下为`lib/wasm-sc-runtime.dll`, `lib/wasmer.dll`)复制到链接器(linker)能找到的默认目录下，如Linux系统下的`/usr/local/lib`或`/usr/lib`等，可将头文件`include/wasm-sc-runtime.h`复制到编译器(compiler)能找到的默认目录下，如Linux系统下的`/usr/local/include`或`usr/include`
 
-**在Windows平台下建议将本软件包下的链接库目录`lib`添加到系统环境变量`PATH`中以便编译和运行。**
+**在Windows平台下须将本软件包下的链接库目录`lib`添加到系统环境变量`PATH`中以便编译和运行。**
 
 也可忽略上述操作，在编译自己的代码时添加相应编译参数，或者基于相应编程语言集成链接库的相关工具和方法直接在代码中显示加载使用链接库和头文件。
 
@@ -44,21 +44,26 @@ $ ./your_target_name
 $ your_target_name.exe
 ```
 > Windows下也可基于MinGW环境使用上述gcc命令编译
-> 注意在Windows平台下建议将本软件包下的链接库目录`lib`添加到系统环境变量`PATH`中以便编译和运行。**
+
+> **注意在Windows平台下须将本软件包下的链接库目录`lib`路径添加到系统环境变量`PATH`中以便编译和运行。**
 
 > 若智能合约中有用到密码学相关专用指令功能，编译时需要添加引入OpenSSL共享库的参数`-lssl -lcrypto`，如：
 > ```bash
 > $ gcc -o your_terget_name your_source_code.c -lwasm-sc-runtime -lssl -lcrypto
 > ```
+
 > Windows下也可基于MinGW环境使用上述gcc命令编译
 > 可参考示例文件`examples/crypto/crypto.c`中的相应注释说明部分。
 
 若没有执行上部分的安装操作，可能需要在编译时添加相应参数，如当在本软件包根目录下编译时：
 ```bash
 // 编译源码生成可执行程序
+// (若在Windows下使用PowerShell编译时需要删除命令末尾的参数`-Wl,-rpath,./lib`)
 $ gcc -o your_terget_name your_source_code.c -lwasm-sc-runtime -I./include -L./lib -Wl,-rpath,./lib
 // 运行编译结果
 $ ./your_target_name
+// 或在Windows下运行编译结果(注意在Windows下需先将包含libwasm-sc-runtime.dll的目录lib路径添加到系统环境变量Path中)
+$ your_target_name.exe
 ```
 
 ### API Reference
