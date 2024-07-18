@@ -136,6 +136,11 @@ wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
    - `func_result_status_enum status`: 表示调用合约方法结果状态, 枚举类型，可为0(表示成功), 1(表示失败)
    - `char *err_msg`: 以`\0`字符结尾的字符串，表示若结果为失败时附加的错误信息
    - `unsigned long long gas_cost`: 调用合约方法结束后所消耗的gas量
+   - `reported_return_data ret`: 调用的合约方法所返回的结果，其类型为结构体`reported_return_data`，包含属性：
+      - `unsigned char *data`: 合约方法返回结果数据指针
+      - `unsigned long data_size`: 合约方法返回结果数据字节数
+      - `const char* data_type`: 合约方法返回结果数据类型，如int128, uint28
+      - `const char* data_as_number_string`: 合约方法返回结果数据作为数字类型时所对应的十进制数字字符串
 
 7. `func_result *smart_contract_function_call_keep_contract_instance(wasm_sc_runtime *runtime, wasm_sc_vm *vm, void *ctx, const char *call_id, int call_id_len, const char *func_name, int func_name_len, unsigned char *args[], int args_len[], int arg_count)`
 
