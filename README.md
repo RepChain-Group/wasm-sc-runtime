@@ -3,6 +3,8 @@ wasm-sc-runtime提供了支持智能合约专用指令集的智能合约执行�
 
 本软件包通过动态链接库/共享链接库的方式提供了C语言形式的API接口，开发者可使用各种流行编程语言（如C/C++, Java, Scala, Go, Python, Rust等）基于相应API接口集成使用智能合约引擎。
 
+**本软件包可通过地址 https://github.com/RepChain-Group/wasm-sc-runtime/releases 进行下载。**
+
 > 本软件包当前版本只支持在以下平台运行
 > - Linux AMD64/x86_64
 > - Windows AMD64/x86_64
@@ -17,7 +19,7 @@ lib      // 链接库目录
 
     wasm-sc-runtime.dll (for Windows)
     wasmer.dll (for Windows)
-examples // 使用示例目录，包含示例代码
+examples // 使用示例目录，包含各种示例代码
     ......
 README.md
 ```
@@ -190,6 +192,11 @@ wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
    释放智能合约引擎实例所占内存。
 
 更多内容可进一步参考头文件`include/wasm-sc-runtime.h`。
+
+### 底层链平台对接
+提供了合约引擎与底层链平台对接的交互抽象接口，包括读取合约状态数据、写入合约状态数据等，具体可参考`include/wasm-sc-runtime.h`中的结构体`BCEI`的定义，其每个字段是一个方法指针，每一个方法指针表示对应的链交互方法接口，对接方可以自行实现每个具体的方法，并以此创建`BCIE`结构体实例，`BCIE`结构体实例可作为参数，用于创建智能合约虚拟机实例，并用于后续合约方法调用。
+
+在本软件包目录下的子目录[examples/blockchain-interface](examples/blockchain-interface)中包含有相应的与底层链平台对接的示例代码，如`examples/blockchain-interface/kv/kv.c`包含与底层链平台对接交互进行合约状态数据读取、存储的示例。
 
 ### 示例
 在本软件包目录下的子目录[examples](examples)中我们提供了使用wasm-sc-runtime的示例，可参考相应代码内容。其中每个示例包括作为智能合约源码的`_<name>.wat`文件以及集成智能合约引擎运行该智能合约代码的程序源码文件`<name>.c`，可参考相应程序源码文件中顶部的注释内容编译运行该示例程序。
