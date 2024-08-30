@@ -78,7 +78,7 @@ $ your_target_name.exe
 
 其中，基于同一个智能合约执行引擎实例可以创建若干个智能合约虚拟机实例，而基于同一个智能合约虚拟机实例可以进行若干次合约方法调用。
 
-当每次调用智能合约方法时默认将会自动创建一个智能合约实例，该智能合约实例拥有独立的内存空间等执行环境，每次调用智能合约方法结束后将自动销毁该智能合约实例，也可指定保留创建的智能合约实例用于相同智能合约虚拟机实例下的下一次智能合约方法调用，以达到复用智能合约内存空间等执行环境的目的，具体可参考下面的相应API说明部分。
+当每次调用智能合约方法时默认将会自动创建一个智能合约实例，该智能合约实例拥有独立的内存空间等执行环境，每次调用智能合约方法结束后将自动销毁该智能合约实例，也可指定保留创建的智能合约实例用于相同智能合约虚拟机实例下的下一次智能合约方法调用，以达到复用智能合约内存空间，保持合约状态数据等执行环境的目的，具体可参考下面的相应API说明部分。
 
 wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
 
@@ -104,19 +104,35 @@ wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
    
    其所需参数和方法`smart_contract_vm_new`一致。
 
-4. `wasm_sc_vm* smart_contract_vm_new_with_debug(wasm_sc_runtime* runtime, BCEI* bcei, const char* vm_id, int vm_id_len, const char* wat_file_path,int wat_file_path_len, int break_point_line_number)`
+4. `wasm_sc_vm* smart_contract_vm_gcl_with_abi_new(wasm_sc_runtime *runtime, BCEI *bcei, const char *vm_id, int vm_id_len, const char *wat_file_path, int wat_file_path_len, const char *abi, int abi_len)`
+
+   根据由GCL合约语言编译得到的专用指令序列合约代码创建智能合约虚拟机实例，并支持使用GCL合约编译得到的ABI信息帮助合约方法执行，方便与链平台对接。
+   
+   其所需参数和方法`smart_contract_vm_gcl_new`相比，多了两个参数，其余参数与其一致:
+   - `const char *abi`: 表示对应的ABI信息字符串，该字符串应是由GCL合约编译得到的Json格式ABI信息字符串
+   - `int abi_len`: 表示对应的ABI信息字符串的长度
+
+5. `wasm_sc_vm* smart_contract_vm_new_with_debug(wasm_sc_runtime* runtime, BCEI* bcei, const char* vm_id, int vm_id_len, const char* wat_file_path,int wat_file_path_len, int break_point_line_number)`
 
    创建智能合约虚拟机实例，并支持设置断点获取调试信息。
    
    其所需参数与方法`smart_contract_vm_new`相比多了一个指定断点行号的参数`int break_point_line_number`。
 
-5. `wasm_sc_vm* smart_contract_vm_gcl_new_with_debug(wasm_sc_runtime* runtime, BCEI* bcei, const char* vm_id, int vm_id_len, const char* wat_file_path,int wat_file_path_len, int break_point_line_number)`
+6. `wasm_sc_vm* smart_contract_vm_gcl_new_with_debug(wasm_sc_runtime* runtime, BCEI* bcei, const char* vm_id, int vm_id_len, const char* wat_file_path,int wat_file_path_len, int break_point_line_number)`
 
    根据由GCL合约语言编译得到的专用指令序列合约代码创建智能合约虚拟机实例，并支持设置断点获取调试信息。
    
    其所需参数与方法`smart_contract_vm_new_with_debug`一致。
 
-6. `func_result *smart_contract_function_call(wasm_sc_runtime *runtime, wasm_sc_vm *vm, void *ctx, const char *call_id, int call_id_len, const char *func_name, int func_name_len, unsigned char *args[], int args_len[], int arg_count)`
+7. `wasm_sc_vm *smart_contract_vm_gcl_with_abi_new_with_debug(wasm_sc_runtime *runtime, BCEI *bcei, const char *vm_id, int vm_id_len, const char *wat_file_path, int wat_file_path_len, const char *abi, int abi_len, int break_point_line_number)` 
+
+   根据由GCL合约语言编译得到的专用指令序列合约代码创建智能合约虚拟机实例，并支持使用GCL合约编译得到的ABI信息帮助合约方法执行，方便与链平台对接。并支持设置断点获取调试信息。
+   
+   其所需参数与方法`smart_contract_vm_gcl_new_with_debug`相比，多了两个参数，其余参数与其一致:
+   - `const char *abi`: 表示对应的ABI信息字符串，该字符串应是由GCL合约编译得到的Json格式ABI信息字符串
+   - `int abi_len`: 表示对应的ABI信息字符串的长度
+
+8. `func_result *smart_contract_function_call(wasm_sc_runtime *runtime, wasm_sc_vm *vm, void *ctx, const char *call_id, int call_id_len, const char *func_name, int func_name_len, unsigned char *args[], int args_len[], int arg_count)`
 
    调用具体的智能合约方法。
    
@@ -144,7 +160,7 @@ wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
       - `const char* data_type`: 合约方法返回结果数据类型，如int128, uint28
       - `const char* data_as_number_string`: 合约方法返回结果数据作为数字类型时所对应的十进制数字字符串
 
-7. `func_result *smart_contract_function_call_keep_contract_instance(wasm_sc_runtime *runtime, wasm_sc_vm *vm, void *ctx, const char *call_id, int call_id_len, const char *func_name, int func_name_len, unsigned char *args[], int args_len[], int arg_count)`
+9. `func_result *smart_contract_function_call_keep_contract_instance(wasm_sc_runtime *runtime, wasm_sc_vm *vm, void *ctx, const char *call_id, int call_id_len, const char *func_name, int func_name_len, unsigned char *args[], int args_len[], int arg_count)`
 
    调用具体的智能合约方法。
    
@@ -152,7 +168,7 @@ wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
 
    其所需参数与方法`smart_contract_function_call`一致。
 
-8. `wasm_sc_contract_instance *get_contract_instance(wasm_sc_vm *vm, const char *contract_instance_id, int contract_instance_id_len)`
+10. `wasm_sc_contract_instance *get_contract_instance(wasm_sc_vm *vm, const char *contract_instance_id, int contract_instance_id_len)`
 
    获取已生成的智能合约实例，可复用该智能合约实例进行后续智能合约方法调用。
 
@@ -163,7 +179,7 @@ wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
    - `const char *contract_instance_id`: 表示智能合约实例唯一标识的字符串指针
    - `int contract_instance_id_len`: 表示智能合约实例唯一标识字符串的长度
 
-9. `func_result *smart_contract_function_call_reuse_contract_instance_then_drop(wasm_sc_runtime *runtime, wasm_sc_vm *vm, void *ctx, const char *call_id, int call_id_len, const char *func_name, int func_name_len, unsigned char *args[], int args_len[], int arg_count, wasm_sc_contract_instance *contract_instance)`
+11. `func_result *smart_contract_function_call_reuse_contract_instance_then_drop(wasm_sc_runtime *runtime, wasm_sc_vm *vm, void *ctx, const char *call_id, int call_id_len, const char *func_name, int func_name_len, unsigned char *args[], int args_len[], int arg_count, wasm_sc_contract_instance *contract_instance)`
 
    调用具体的智能合约方法。
    
@@ -171,7 +187,7 @@ wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
 
    其所需参数与方法`smart_contract_function_call`相比，多了一个表示要复用的智能合约实例指针`wasm_sc_contract_instance *contract_instance`, 相应智能合约实例在本次智能合约方法调用结束后将被释放。
 
-10. `func_result *smart_contract_function_call_reuse_contract_instance_then_keep(wasm_sc_runtime *runtime, wasm_sc_vm *vm, void *ctx, const char *call_id, int call_id_len, const char *func_name, int func_name_len, unsigned char *args[], int args_len[], int arg_count, wasm_sc_contract_instance *contract_instance)`
+12. `func_result *smart_contract_function_call_reuse_contract_instance_then_keep(wasm_sc_runtime *runtime, wasm_sc_vm *vm, void *ctx, const char *call_id, int call_id_len, const char *func_name, int func_name_len, unsigned char *args[], int args_len[], int arg_count, wasm_sc_contract_instance *contract_instance)`
 
    调用具体的智能合约方法。
    
@@ -179,15 +195,15 @@ wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
 
    其所需参数与方法`smart_contract_function_call_reuse_contract_instance_then_drop`一致。
 
-11. `void smart_contract_func_result_delete(func_result *result)`
+13. `void smart_contract_func_result_delete(func_result *result)`
 
    释放合约方法调用结果数据所占内存。
 
-12. `void smart_contract_vm_delete(wasm_sc_runtime *runtime, const wasm_sc_vm *vm)`
+14. `void smart_contract_vm_delete(wasm_sc_runtime *runtime, const wasm_sc_vm *vm)`
 
    释放智能合约虚拟机实例所占内存。
 
-13. `void smart_contract_runtime_delete(wasm_sc_runtime *runtime)`
+15. `void smart_contract_runtime_delete(wasm_sc_runtime *runtime)`
 
    释放智能合约引擎实例所占内存。
 
@@ -196,7 +212,9 @@ wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
 ### 底层链平台对接
 提供了合约引擎与底层链平台对接的交互抽象接口，包括读取合约状态数据、写入合约状态数据等，具体可参考`include/wasm-sc-runtime.h`中的结构体`BCEI`的定义，其每个字段是一个方法指针，每一个方法指针表示对应的链交互方法接口，对接方可以自行实现每个具体的方法，并以此创建`BCIE`结构体实例，`BCIE`结构体实例可作为参数，用于创建智能合约虚拟机实例，并用于后续合约方法调用。
 
-在本软件包目录下的子目录[examples/blockchain-interface](examples/blockchain-interface)中包含有相应的与底层链平台对接的示例代码，如`examples/blockchain-interface/kv/kv.c`包含与底层链平台对接交互进行合约状态数据读取、存储的示例。
+在本软件包目录下的子目录[examples/blockchain-interface](examples/blockchain-interface)中包含有相应的与底层链平台对接的示例代码。
+
+另外本软件包目录下的子目录[examples/work-with-gcl](examples/work-with-gcl)中也有与底层链平台对接的示例代码示例代码，如`examples/work-with-gcl/token/main.cpp`中包含与底层链平台对接交互进行合约状态数据读取、写入的示例。
 
 ### 示例
-在本软件包目录下的子目录[examples](examples)中我们提供了使用wasm-sc-runtime的示例，可参考相应代码内容。其中每个示例包括作为智能合约源码的`_<name>.wat`文件以及集成智能合约引擎运行该智能合约代码的程序源码文件`<name>.c`，可参考相应程序源码文件中顶部的注释内容编译运行该示例程序。
+在本软件包目录下的子目录[examples](examples)中我们提供了使用wasm-sc-runtime的示例，可参考相应代码内容。其中每个示例包括作为智能合约源码的`.wat`文件以及集成智能合约引擎运行该智能合约代码的程序源码文件`.c`或`.cpp`等，可参考相应程序源码文件中顶部的注释内容编译运行该示例程序。
