@@ -98,41 +98,30 @@ wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
    - `const char *wat_file_path`: 表示对应的智能合约代码文件路径的字符串指针，目前该文件内容需为文本格式
    - `int wat_file_path_len`: 表示智能合约代码文件路径的字符串的长度
 
-3. `wasm_sc_vm *smart_contract_vm_gcl_new(wasm_sc_runtime *runtime, BCEI *bcei, const char *vm_id, int vm_id_len, const char *wat_file_path, int wat_file_path_len)`
+3. `wasm_sc_vm *smart_contract_vm_gcl_new(wasm_sc_runtime* runtime, BCEI* bcei, contract_id contract_id, const_data wat_bytes, const_data abi_bytes)`
 
    根据由GCL合约语言编译得到的专用指令序列合约代码创建智能合约虚拟机实例。
    
-   其所需参数和方法`smart_contract_vm_new`一致。
+   其所需参数包括：
+   - `wasm_sc_runtime *runtime`: 智能合约引擎实例指针
+   - `BCEI *bcei`: 区块链平台环境接口实例指针，该接口实例需要开发者自行实现，其中所有接口方法的第一个参数为合约方法调用上下文实例，开发者可结合该参数实现相应接口的具体逻辑
+   - `contract_id contract_id`: 智能合约唯一标识，其中contract_id类型即为无符号64位整数uint64_t
+   - `const_data wat_bytes`: 表示对应的智能合约代码数据，其类型const_data为结构体struct { const uint8_t *data_ptr; uint32_t data_size; }, data_ptr为指向智能合约代码数据的指针，data_size为智能合约代码数据长度
+   - `const_data abi_bytes`: 表示对应的ABI信息数据，其类型const_data为结构体struct { const uint8_t *data_ptr; uint32_t data_size; }, data_ptr为指向ABI信息数据的指针，data_size为ABI信息数据长度
 
-4. `wasm_sc_vm* smart_contract_vm_gcl_with_abi_new(wasm_sc_runtime *runtime, BCEI *bcei, const char *vm_id, int vm_id_len, const char *wat_file_path, int wat_file_path_len, const char *abi, int abi_len)`
-
-   根据由GCL合约语言编译得到的专用指令序列合约代码创建智能合约虚拟机实例，并支持使用GCL合约编译得到的ABI信息帮助合约方法执行，方便与链平台对接。
-   
-   其所需参数和方法`smart_contract_vm_gcl_new`相比，多了两个参数，其余参数与其一致:
-   - `const char *abi`: 表示对应的ABI信息字符串，该字符串应是由GCL合约编译得到的Json格式ABI信息字符串
-   - `int abi_len`: 表示对应的ABI信息字符串的长度
-
-5. `wasm_sc_vm* smart_contract_vm_new_with_debug(wasm_sc_runtime* runtime, BCEI* bcei, const char* vm_id, int vm_id_len, const char* wat_file_path,int wat_file_path_len, int break_point_line_number)`
+4. `wasm_sc_vm* smart_contract_vm_new_with_debug(wasm_sc_runtime* runtime, BCEI* bcei, const char* vm_id, int vm_id_len, const char* wat_file_path,int wat_file_path_len, int break_point_line_number)`
 
    创建智能合约虚拟机实例，并支持设置断点获取调试信息。
    
    其所需参数与方法`smart_contract_vm_new`相比多了一个指定断点行号的参数`int break_point_line_number`。
 
-6. `wasm_sc_vm* smart_contract_vm_gcl_new_with_debug(wasm_sc_runtime* runtime, BCEI* bcei, const char* vm_id, int vm_id_len, const char* wat_file_path,int wat_file_path_len, int break_point_line_number)`
+5. `wasm_sc_vm* smart_contract_vm_gcl_new_with_debug(wasm_sc_runtime* runtime, BCEI* bcei, contract_id contract_id, const_data wat_bytes, const_data abi_bytes, int break_point_line_number)`
 
    根据由GCL合约语言编译得到的专用指令序列合约代码创建智能合约虚拟机实例，并支持设置断点获取调试信息。
    
-   其所需参数与方法`smart_contract_vm_new_with_debug`一致。
+   其所需参数与方法`smart_contract_vm_gcl_new`相比多了一个指定断点行号的参数`int break_point_line_number`。
 
-7. `wasm_sc_vm *smart_contract_vm_gcl_with_abi_new_with_debug(wasm_sc_runtime *runtime, BCEI *bcei, const char *vm_id, int vm_id_len, const char *wat_file_path, int wat_file_path_len, const char *abi, int abi_len, int break_point_line_number)` 
-
-   根据由GCL合约语言编译得到的专用指令序列合约代码创建智能合约虚拟机实例，并支持使用GCL合约编译得到的ABI信息帮助合约方法执行，方便与链平台对接。并支持设置断点获取调试信息。
-   
-   其所需参数与方法`smart_contract_vm_gcl_new_with_debug`相比，多了两个参数，其余参数与其一致:
-   - `const char *abi`: 表示对应的ABI信息字符串，该字符串应是由GCL合约编译得到的Json格式ABI信息字符串
-   - `int abi_len`: 表示对应的ABI信息字符串的长度
-
-8. `func_result *smart_contract_function_call(wasm_sc_runtime *runtime, wasm_sc_vm *vm, void *ctx, const char *call_id, int call_id_len, const char *func_name, int func_name_len, unsigned char *args[], int args_len[], int arg_count)`
+6. `func_result *smart_contract_function_call(wasm_sc_runtime *runtime, wasm_sc_vm *vm, void *ctx, const char *call_id, int call_id_len, const char *func_name, int func_name_len, unsigned char *args[], int args_len[], int arg_count)`
 
    调用具体的智能合约方法。
    
@@ -160,7 +149,7 @@ wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
       - `const char* data_type`: 合约方法返回结果数据类型，如int128, uint28
       - `const char* data_as_number_string`: 合约方法返回结果数据作为数字类型时所对应的十进制数字字符串
 
-9. `func_result *smart_contract_function_call_keep_contract_instance(wasm_sc_runtime *runtime, wasm_sc_vm *vm, void *ctx, const char *call_id, int call_id_len, const char *func_name, int func_name_len, unsigned char *args[], int args_len[], int arg_count)`
+7. `func_result *smart_contract_function_call_keep_contract_instance(wasm_sc_runtime *runtime, wasm_sc_vm *vm, void *ctx, const char *call_id, int call_id_len, const char *func_name, int func_name_len, unsigned char *args[], int args_len[], int arg_count)`
 
    调用具体的智能合约方法。
    
@@ -168,7 +157,7 @@ wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
 
    其所需参数与方法`smart_contract_function_call`一致。
 
-10. `wasm_sc_contract_instance *get_contract_instance(wasm_sc_vm *vm, const char *contract_instance_id, int contract_instance_id_len)`
+8. `wasm_sc_contract_instance *get_contract_instance(wasm_sc_vm *vm, const char *contract_instance_id, int contract_instance_id_len)`
 
    获取已生成的智能合约实例，可复用该智能合约实例进行后续智能合约方法调用。
 
@@ -179,7 +168,7 @@ wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
    - `const char *contract_instance_id`: 表示智能合约实例唯一标识的字符串指针
    - `int contract_instance_id_len`: 表示智能合约实例唯一标识字符串的长度
 
-11. `func_result *smart_contract_function_call_reuse_contract_instance_then_drop(wasm_sc_runtime *runtime, wasm_sc_vm *vm, void *ctx, const char *call_id, int call_id_len, const char *func_name, int func_name_len, unsigned char *args[], int args_len[], int arg_count, wasm_sc_contract_instance *contract_instance)`
+9. `func_result *smart_contract_function_call_reuse_contract_instance_then_drop(wasm_sc_runtime *runtime, wasm_sc_vm *vm, void *ctx, const char *call_id, int call_id_len, const char *func_name, int func_name_len, unsigned char *args[], int args_len[], int arg_count, wasm_sc_contract_instance *contract_instance)`
 
    调用具体的智能合约方法。
    
@@ -187,7 +176,7 @@ wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
 
    其所需参数与方法`smart_contract_function_call`相比，多了一个表示要复用的智能合约实例指针`wasm_sc_contract_instance *contract_instance`, 相应智能合约实例在本次智能合约方法调用结束后将被释放。
 
-12. `func_result *smart_contract_function_call_reuse_contract_instance_then_keep(wasm_sc_runtime *runtime, wasm_sc_vm *vm, void *ctx, const char *call_id, int call_id_len, const char *func_name, int func_name_len, unsigned char *args[], int args_len[], int arg_count, wasm_sc_contract_instance *contract_instance)`
+10. `func_result *smart_contract_function_call_reuse_contract_instance_then_keep(wasm_sc_runtime *runtime, wasm_sc_vm *vm, void *ctx, const char *call_id, int call_id_len, const char *func_name, int func_name_len, unsigned char *args[], int args_len[], int arg_count, wasm_sc_contract_instance *contract_instance)`
 
    调用具体的智能合约方法。
    
@@ -195,15 +184,31 @@ wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
 
    其所需参数与方法`smart_contract_function_call_reuse_contract_instance_then_drop`一致。
 
-13. `void smart_contract_func_result_delete(func_result *result)`
+11. `func_result* smart_contract_function_gcl_call(wasm_sc_runtime* runtime, wasm_sc_vm* vm, context* ctx, c_string call_id, c_string func_name, const_data args)` 
+
+    调用gcl合约中的具体智能合约方法。
+
+    该方法将自动创建智能合约实例并在调用结束时自动销毁该实例。
+
+    所需参数包括：
+    - `wasm_sc_runtime *runtime`: 智能合约引擎实例指针 
+    - `wasm_sc_vm *vm`: 智能合约虚拟机实例指针
+    - `context *ctx`: 合约方法调用上下文实例指针，该上下文实例为开发者自定义的数据结构实例，该上下文实例数据将被传递给区块链平台环境接口实例中的每一个接口方法
+    - `c_string call_id`: 调用标识字符串指针('\0'结尾), 即给本次调用合约方法的行为赋予一个唯一标识，比如可以将引起本次调用合约方法的区块链交易txid作为该值。该唯一标识也被作为调用合约方法时所创建的智能合约实例的唯一标识。
+    - `c_string func_name`: 要调用的合约方法名字符串指针('\0'结尾)
+    - `const_data args`: 合约方法参数，其类型为结构体`const_data`，包含属性：
+      - `const uint8_t *data_ptr`: 合约方法参数数据指针
+      - `uint32_t data_size`: 合约方法参数数据字节数
+
+12. `void smart_contract_func_result_delete(func_result *result)`
 
    释放合约方法调用结果数据所占内存。
 
-14. `void smart_contract_vm_delete(wasm_sc_runtime *runtime, const wasm_sc_vm *vm)`
+13. `void smart_contract_vm_delete(wasm_sc_runtime *runtime, const wasm_sc_vm *vm)`
 
    释放智能合约虚拟机实例所占内存。
 
-15. `void smart_contract_runtime_delete(wasm_sc_runtime *runtime)`
+14. `void smart_contract_runtime_delete(wasm_sc_runtime *runtime)`
 
    释放智能合约引擎实例所占内存。
 
@@ -211,8 +216,6 @@ wasm-sc-runtime主要提供了如下所示的C语言形式APIs：
 
 ### 底层链平台对接
 提供了合约引擎与底层链平台对接的交互抽象接口，包括读取合约状态数据、写入合约状态数据等，具体可参考`include/wasm-sc-runtime.h`中的结构体`BCEI`的定义，其每个字段是一个方法指针，每一个方法指针表示对应的链交互方法接口，对接方可以自行实现每个具体的方法，并以此创建`BCIE`结构体实例，`BCIE`结构体实例可作为参数，用于创建智能合约虚拟机实例，并用于后续合约方法调用。
-
-在本软件包目录下的子目录[examples/blockchain-interface](examples/blockchain-interface)中包含有相应的与底层链平台对接的示例代码。
 
 另外本软件包目录下的子目录[examples/work-with-gcl](examples/work-with-gcl)中也有与底层链平台对接的示例代码示例代码，如`examples/work-with-gcl/token/main.cpp`中包含与底层链平台对接交互进行合约状态数据读取、写入的示例。
 
