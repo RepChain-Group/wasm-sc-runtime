@@ -20,6 +20,7 @@ lib      // 链接库目录
 
     libwasm-sc-runtime.dylib (for MacOS)
     libwasm-sc-runtime.<version>.dylib (for MacOS)
+    libwasmer.dylib (for MacOS)
 
     wasm-sc-runtime.dll (for Windows)
     wasmer.dll (for Windows)
