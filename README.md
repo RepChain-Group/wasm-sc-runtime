@@ -5,9 +5,10 @@ wasm-sc-runtime提供了支持智能合约专用指令集的智能合约执行�
 
 **本软件包可通过地址 https://github.com/RepChain-Group/wasm-sc-runtime/releases 进行下载。**
 
-> 本软件包当前版本只支持在以下平台运行
-> - Linux AMD64/x86_64
+> 本软件包当前支持在以下平台运行
+> - Linux AMD64/x86_64, arm64/aarch64
 > - Windows AMD64/x86_64
+> - MacOS AMD64/x86_64, arm64/aarch64
 
 ## 软件包目录结构
 ```bash
@@ -16,6 +17,9 @@ include  // 头文件目录
 lib      // 链接库目录
     libwasm-sc-runtime.so (for Linux)
     libwasm-sc-runtime.so.<version> (for Linux)
+
+    libwasm-sc-runtime.dylib (for MacOS)
+    libwasm-sc-runtime.<version>.dylib (for MacOS)
 
     wasm-sc-runtime.dll (for Windows)
     wasmer.dll (for Windows)
